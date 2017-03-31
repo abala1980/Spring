@@ -32,6 +32,14 @@
 
     <properties>
         <java.version>1.8</java.version>
+        <!-- Sonar -->
+        <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+        <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
+        <sonar.jacoco.reportPaths>${basedir}/target/jacoco.exec</sonar.jacoco.reportPaths>
+        <sonar.jacoco.reportMissing.force.zero>true</sonar.jacoco.reportMissing.force.zero>
+        <sonar.language>java</sonar.language>
+        <sonar.pitest.mode>skip</sonar.pitest.mode>
+        <sonar.pitest.reportsDirectory>${basedir}/target/pit-reports</sonar.pitest.reportsDirectory>
     </properties>
 
     <build>
@@ -42,12 +50,48 @@
                     <artifactId>sonar-maven-plugin</artifactId>
                     <version>3.2</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>0.7.9</version>
+                    <configuration>
+                        <destFile>${sonar.jacoco.reportPaths}</destFile>
+                        <append>true</append>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>agent</id>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <!-- inside the build/plugins section -->
+            <plugin>
+                <groupId>org.pitest</groupId>
+                <artifactId>pitest-maven</artifactId>
+                <version>1.1.11</version>
+                <configuration>
+                    <skip>true</skip>
+                    <targetClasses>
+                        <param>hello.*</param>
+                    </targetClasses>
+                    <targetTests>
+                        <param>hello.*</param>
+                    </targetTests>
+                    <outputFormats>
+                        <outputFormat>CSV</outputFormat>
+                        <outputFormat>XML</outputFormat>
+                    </outputFormats>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
